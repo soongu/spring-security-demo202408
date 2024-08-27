@@ -58,11 +58,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/users/register")) // 특정 URL에 대해 CSRF 비활성화
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/users/register", "/h2-console/**")) // 특정 URL에 대해 CSRF 비활성화
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/users/register").permitAll()
+                        .requestMatchers("/api/users/register", "/h2-console/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")  // "/admin/**" 경로는 "ADMIN" 권한이 있는 사용자만 접근 가능하게 합니다.
                         .anyRequest().authenticated()  // 나머지 모든 요청은 인증된 사용자만 접근할 수 있습니다.
+                )
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp.policyDirectives("frame-ancestors 'self'"))
                 )
                 .formLogin(withDefaults());  // 기본 로그인 폼 설정을 사용합니다.
 
