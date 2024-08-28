@@ -1,5 +1,12 @@
 server:
   port: 8082
+#  ssl:
+#    key-store: classpath:keystore.p12
+#    key-store-password: 9984
+#    keyStoreType: PKCS12
+#    keyAlias: springboot
+#    enabled: true
+
 
 # HTTPS ?? ?? (?? ??)
 # server:

@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +18,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration  // 이 클래스가 스프링의 설정 클래스임을 나타냅니다.
 @RequiredArgsConstructor  // final 필드에 대해 생성자를 자동으로 생성해주는 Lombok 어노테이션입니다.
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
 
     // 사용자 정보를 로드하는 서비스입니다. 스프링 컨텍스트에 의해 주입됩니다.
@@ -58,10 +61,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/users/register", "/h2-console/**")) // 특정 URL에 대해 CSRF 비활성화
+                .csrf(AbstractHttpConfigurer::disable) // 특정 URL에 대해 CSRF 비활성화
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/users/register", "/h2-console/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")  // "/admin/**" 경로는 "ADMIN" 권한이 있는 사용자만 접근 가능하게 합니다.
+                        .requestMatchers("/api/secure/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()  // 나머지 모든 요청은 인증된 사용자만 접근할 수 있습니다.
                 )
                 .headers(headers -> headers

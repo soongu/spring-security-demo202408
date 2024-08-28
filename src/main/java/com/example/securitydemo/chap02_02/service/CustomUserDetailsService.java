@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.security.core.userdetails.User.UserBuilder;
 
 import static org.springframework.security.core.userdetails.User.withUsername;
 
@@ -37,15 +36,11 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         // UserBuilder를 사용해 스프링 시큐리티에서 사용할 UserDetails 객체를 생성합니다.
-        UserBuilder builder = withUsername(username);
-
-        // 데이터베이스에서 조회된 사용자의 암호를 설정합니다.
-        builder.password(user.getPassword());
-
-        // 사용자의 역할(Role)을 설정합니다.
-        builder.roles(user.getRole());
-
-        // 생성된 UserDetails 객체를 반환합니다.
-        return builder.build();
+        return withUsername(username)
+                // 데이터베이스에서 조회된 사용자의 암호를 설정합니다.
+                .password(user.getPassword())
+                // 사용자의 역할(Role)을 설정합니다.
+                .roles(user.getRole())
+                .build();
     }
 }
